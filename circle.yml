@@ -18,6 +18,7 @@ test:
   pre:
     - go version
   override:
+    - pwd
     - test -z $(gofmt -s -l . | tee /dev/stderr)
     - go vet ./...
     - test -z $(golint ./...          | tee /dev/stderr)
