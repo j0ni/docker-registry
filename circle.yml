@@ -44,7 +44,8 @@ general:
       - 0.8
       - 0.9
       - 1.0
-
+  build_dir: $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+  
 # notify:
 #     email:
 #         recipients:
