@@ -1,0 +1,65 @@
+machine:
+  pre:
+    - curl -o go.tar.gz -sL https://golang.org/dl/go1.4rc2.linux-amd64.tar.gz
+    - sudo rm -rf /usr/local/go
+    - sudo tar -C /usr/local -xzf go.tar.gz
+    - sudo chmod a+w /usr/local/go/src/
+
+  hosts:
+    fancy: 127.0.0.1
+
+dependencies:
+  post:
+    - pwd
+    - echo $GOPATH
+    - go get github.com/axw/gocov/gocov
+    - go get github.com/mattn/goveralls
+    - go get github.com/golang/lint/golint
+
+test:
+  pre:
+    - go version
+    - echo $GOPATH
+    - pwd
+  override:
+    - pwd
+    - echo $GOPATH
+    - test -z $(gofmt -s -l . | tee /dev/stderr)
+    - go vet ./...
+    - test -z $(golint ./...          | tee /dev/stderr)
+    - pwd
+    - cd $HOME/.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME && go list ./... | xargs -I{} goveralls -repotoken $COVERALLS_TOKEN -race {}
+
+# Add coverage back in later
+
+  # post:
+  #   - find ./ -iname "profile.tmp" -exec tail -n +2 {} >> profile.cov \;
+  #   - goveralls -service drone.io -coverprofile=profile.cov -repotoken $COVERALLS_TOKEN
+
+general:
+  branches:
+    ignore:
+      - master
+      - 0.7
+      - 0.8
+      - 0.9
+      - 1.0
+  build_dir: ../.go_project/src/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
+
+# notify:
+#     email:
+#         recipients:
+#             - distribution@docker.com
+
+#     slack:
+#         team: docker
+#         channel: "#dt"
+#         username: mom
+#         token: {{SLACK_TOKEN}}
+#         on_success: false
+#         on_failure: true
+
+  # Do we want these as well?
+  # - go get code.google.com/p/go.tools/cmd/goimports
+  # - test -z "$(goimports -l -w ./... | tee /dev/stderr)"
+  # http://labix.org/gocheck
