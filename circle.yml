@@ -1,27 +1,17 @@
 machine:
   environment:
-    GOLANG_VERSION: 1.4rc1
-    CIRCLECI_DRIVES_ME_CRAZY: "mode: count"
-
-  # services:
-  #   - cassandra
-  #   - elasticsearch
-  #   - rabbitmq-server
-  #   - riak
-  #   - beanstalkd
-  #   - couchbase-server
-  #   - neo4j
-  #   - sphinxsearch
+    GOLANG_VERSION: 1.4rc2
+   pre:
+    - curl -k -L -o go.tar.gz https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+    - sudo rm -rf /usr/local/go
+    - sudo tar -C /usr/local -xzf go.tar.gz
+    - sudo chmod a+w /usr/local/go/src/
 
   hosts:
     fancy: 127.0.0.1
 
 dependencies:
-  pre:
-    - curl -k -L -o go.tar.gz https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
-    - sudo rm -rf /usr/local/go
-    - sudo tar -C /usr/local -xzf go.tar.gz
-    - sudo chmod a+w /usr/local/go/src/
+
   post:
     - go get github.com/axw/gocov/gocov
     - go get github.com/mattn/goveralls
@@ -32,7 +22,6 @@ test:
     - go version
 
   override:
-    - echo $CIRCLECI_DRIVES_ME_CRAZY > profile.cov
     # Go fmt
     - test -z "$(gofmt -s -l -w .     | tee /dev/stderr)"
     # Go lint
@@ -40,9 +29,7 @@ test:
     # Go vet
     - go vet ./...
     # Actual tests
-    - find ./ -not -path '*.git*' -not -path '*/_*' -type d -exec go test -v -race -covermode=count -coverprofile={}/profile.tmp {} \;
-    - find ./ -iname "profile.tmp" -exec tail -n +2 {} >> profile.cov \;
-    - goveralls -service drone.io -coverprofile=profile.cov -repotoken $COVERALLS_TOKEN
+    - go list ./... | xargs -I{} goveralls -repotoken $COVERALLS_TOKEN -race {}
 
   # post:
   #   - find ./ -iname "profile.tmp" -exec tail -n +2 {} >> profile.cov \;
