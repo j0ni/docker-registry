@@ -11,7 +11,6 @@ machine:
     fancy: 127.0.0.1
 
 dependencies:
-
   post:
     - go get github.com/axw/gocov/gocov
     - go get github.com/mattn/goveralls
