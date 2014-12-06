@@ -1,6 +1,6 @@
 machine:
   pre:
-    - curl -o go.tar.gz -vsL https://golang.org/dl/go1.4rc2.linux-amd64.tar.gz
+    - curl -o go.tar.gz -sL https://golang.org/dl/go1.4rc2.linux-amd64.tar.gz
     - sudo rm -rf /usr/local/go
     - sudo tar -C /usr/local -xzf go.tar.gz
     - sudo chmod a+w /usr/local/go/src/
@@ -17,16 +17,13 @@ dependencies:
 test:
   pre:
     - go version
-
   override:
-    # Go fmt
-    - test -z "$(gofmt -s -l -w .     | tee /dev/stderr)"
-    # Go lint
-    - test -z "$(golint ./...          | tee /dev/stderr)"
-    # Go vet
+    - test -z $(gofmt -s -l . | tee /dev/stderr)
     - go vet ./...
-    # Actual tests
-    - go list ./... | xargs -I{} goveralls -repotoken $COVERALLS_TOKEN -race {}
+    - test -z $(golint ./...          | tee /dev/stderr)
+    - go test -v -race ./...
+
+# Add coverage back in later
 
   # post:
   #   - find ./ -iname "profile.tmp" -exec tail -n +2 {} >> profile.cov \;
