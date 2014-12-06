@@ -2,6 +2,7 @@ machine:
   environment:
     GOLANG_VERSION: 1.4rc2
   pre:
+    - echo wtf $GOLANG_VERSION
     - curl -o go.tar.gz -vsL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
     - sudo rm -rf /usr/local/go
     - sudo tar -C /usr/local -xzf go.tar.gz
