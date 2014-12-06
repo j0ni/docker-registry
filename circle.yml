@@ -10,6 +10,8 @@ machine:
 
 dependencies:
   post:
+    - pwd
+    - echo $GOPATH
     - go get github.com/axw/gocov/gocov
     - go get github.com/mattn/goveralls
     - go get github.com/golang/lint/golint
@@ -17,12 +19,16 @@ dependencies:
 test:
   pre:
     - go version
+    - echo $GOPATH
+    - pwd
   override:
     - pwd
+    - echo $GOPATH
     - test -z $(gofmt -s -l . | tee /dev/stderr)
     - go vet ./...
     - test -z $(golint ./...          | tee /dev/stderr)
-    - go test -v -race ./...
+    - go list ./... | xargs -I{} goveralls -repotoken $COVERALLS_TOKEN -race {}:
+      pwd: ~/.go_project/github.com/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME
 
 # Add coverage back in later
 
