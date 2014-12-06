@@ -1,6 +1,6 @@
 machine:
   environment:
-    GOLANG_VERSION: 1.4rc2
+    - GOLANG_VERSION: 1.4rc2
    pre:
     - curl -k -L -o go.tar.gz https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
     - sudo rm -rf /usr/local/go
