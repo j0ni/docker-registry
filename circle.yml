@@ -9,6 +9,9 @@ machine:
     fancy: 127.0.0.1
 
 dependencies:
+  pre:
+    - pwd
+    - echo $GOPATH
   post:
     - pwd
     - echo $GOPATH
